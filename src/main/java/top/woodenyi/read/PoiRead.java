@@ -1,5 +1,6 @@
 package top.woodenyi.read;
 
+import org.apache.poi.hwpf.extractor.WordExtractor;
 import top.woodenyi.window.TooltipTextForArea;
 
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -8,6 +9,8 @@ import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.xmlbeans.XmlException;
 
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Copyright (C), Wed,Mar,25,2020,
@@ -68,7 +71,11 @@ public class PoiRead {
         String fileName = fullFilePath.substring(fullFilePath.lastIndexOf("\\")+1);
         System.out.println("filePath = " + filePath + ", fileName = " + fileName);
         try {
-            builder.append(readDocNew(targetStr,filePath,fileName));
+            if (fileName.contains(".docx")) {
+                builder.append(readDocx(targetStr, filePath, fileName));
+            }else {
+                builder.append(readDoc(targetStr,filePath,fileName));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (OpenXML4JException e) {
@@ -79,11 +86,27 @@ public class PoiRead {
         return builder.toString();
     }
 
-    public String readDocNew(String targetStr, String filePath, String fileName) throws IOException, OpenXML4JException, XmlException {
+    public String readDocx(String targetStr, String filePath, String fileName) throws IOException, OpenXML4JException, XmlException {
         StringBuilder stringBuilder = new StringBuilder("");
         XWPFWordExtractor extractor;
         extractor = new XWPFWordExtractor(OPCPackage.open(new FileInputStream(filePath+fileName)));
         String wordText = extractor.getText();
+        System.out.println(wordText);
+        stringBuilder.append(fileHandler(filePath,fileName,wordText,targetStr));
+        System.out.println(stringBuilder.toString());
+        return stringBuilder.toString();
+    }
+
+    public String readDoc(String targetStr, String filePath, String fileName) throws IOException, OpenXML4JException, XmlException {
+        StringBuilder stringBuilder = new StringBuilder("");
+        WordExtractor extractor;
+        extractor = new WordExtractor(new FileInputStream(new File(filePath+fileName)));
+        String wordText = extractor.getText();
+        wordText = wordText.replaceAll("\u200B","").replaceAll(" \\("," {").replaceAll("\\)","}");
+        String regx = "\\{http://office.microsoft.com/zh-cn/excel-help/redir/{1}.+\\}";
+        Matcher matcher = Pattern.compile(regx).matcher(wordText);
+        wordText = matcher.replaceAll("").replaceAll("}","\\)");
+//        wordText.replaceAll("(\u200Bhttp:\u200B/\u200B\u200B/\u200Boffice.microsoft.com\u200B/");
         System.out.println(wordText);
         stringBuilder.append(fileHandler(filePath,fileName,wordText,targetStr));
         System.out.println(stringBuilder.toString());
