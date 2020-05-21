@@ -1,4 +1,4 @@
-package top.woodenyi.window;
+package top.woodenyi.window.listener;
 
 import javax.swing.*;
 import java.awt.*;

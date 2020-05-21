@@ -1,107 +1,38 @@
-package top.woodenyi.window;
+package top.woodenyi.window.listener;
 
 import top.woodenyi.read.PoiRead;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.lang.*;
 
 /**
- * Copyright (C), Tue,Mar,24,2020,
- * FileName: ExecuteFrame
+ * Copyright (C), Wed,May,20,2020,
+ * FileName: ButtonListener
  * Author:   WoodenYi
  * E-mail： curtainldy@163.com
- * Date:     Tue,Mar,24,2020 15:08
- * Description: 操作框
+ * Date:     Wed,May,20,2020 22:25
+ * Description: 按钮监听
  * History:
  * <author>          <time>          <version>          <desc>
  * 作者姓名           修改时间           版本号            描述
- * WoodenYi       2020/3/24 15:08      v_
+ * WoodenYi       2020/5/20 22:25      v_0.0.1        处理“文件选择”、“清空”以及“搜索”按钮的点击事件
  * @author WoodenYi
  */
-public class ExecuteFrame {
+public class ButtonListener {
+    private static final String TITLE = "提示信息";
+    private static final String ERROR_MESSAGE = "目标栏数据异常或文件栏数据异常";
+    private static final String EXPORT_PATH = System.getProperty("user.dir");
 
-    JTextArea target = new JTextArea(10,50);
-    JTextField characterSet = new JTextField(6);
-    JTextArea addressArea = new JTextArea(13,50);
-    JTextArea textArea = new JTextArea(13,50);
-    public Box setExecuteFrame(){
-        JTabbedPane tabbedPane_top = new JTabbedPane();
-        JScrollPane scrollPane_top=new JScrollPane();
-        tabbedPane_top.addTab("目标文本",null,scrollPane_top,null);
-        target.addFocusListener(new TooltipTextForArea(target));
-        scrollPane_top.setViewportView(target);
-
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panel.add(new JLabel("字符集:"));
-        characterSet.setText("UTF-8");
-        panel.add(characterSet);
-        JButton chooseFile = new JButton("选择文件");
-        chooseFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                chooseFile(addressArea);
-            }
-        });
-        panel.add(chooseFile,BorderLayout.NORTH);
-        JButton clear = new JButton("清空");
-        clear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearAction(target,addressArea,textArea);
-            }
-        });
-        panel.add(clear,BorderLayout.NORTH);
-        JButton search = new JButton("搜索");
-        search.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                searchAction(target,addressArea,characterSet,textArea);
-            }
-        });
-        panel.add(search,BorderLayout.NORTH);
-
-        JTabbedPane tabbedPane = new JTabbedPane();
-        JScrollPane scrollPane1=new JScrollPane();
-        tabbedPane.addTab("文件列表",null,scrollPane1,null);
-        scrollPane1.setViewportView(addressArea);
-        JScrollPane scrollPane2=new JScrollPane();
-        tabbedPane.addTab("匹配结果",null,scrollPane2,null);
-        scrollPane2.setViewportView(textArea);
-
-        Box box = Box.createVerticalBox();
-        box.add(tabbedPane_top,BorderLayout.CENTER);
-        box.add(panel,BorderLayout.CENTER);
-        box.add(tabbedPane,BorderLayout.CENTER);
-
-        return box;
-    }
-
-    private void clearAction(JTextArea target, JTextArea addressArea, JTextArea textArea) {
-        target.setText("");
-        addressArea.setText("");
-        textArea.setText("");
-    }
-
-    private void searchAction(JTextArea target, JTextArea address, JTextField characterSet, JTextArea textArea) {
-        StringBuffer resulet = new StringBuffer("");
-        String targetStr = target.getText();
-        System.out.println(targetStr);
-        String charSet = charSetHandler(characterSet.getText());
-        String filePath = address.getText();
-        String[] filePaths = filePath.split("\n");
-        for (String path : filePaths) {
-            resulet.append(fileHandler(path,targetStr,charSet));
-        }
-
-        textArea.setText(resulet.toString());
-    }
-
-    public void chooseFile(JTextArea field){
+    /**
+     * 文件选择按钮点击事件的处理
+     * @param field 控件
+     */
+    public static void chooseFile(JTextArea field){
 //        System.out.println("----------"+field.getText());
         StringBuffer buffer = new StringBuffer(field.getText());
         //初始化文件选择框
@@ -113,7 +44,7 @@ public class ExecuteFrame {
         int returnVal = fDialog.showOpenDialog(null);
         // 如果是选择了文件
         if(JFileChooser.APPROVE_OPTION == returnVal){
-        //打印出文件的路径，你可以修改位 把路径值 写到 textField 中
+            //打印出文件的路径，你可以修改位 把路径值 写到 textField 中
             File[] files = fDialog.getSelectedFiles();
             for (File file : files) {
                 String fileAddress = file.toString();
@@ -131,7 +62,55 @@ public class ExecuteFrame {
         field.setText(buffer.toString());
     }
 
-    public String fileHandler(String filePath,String targetStr,String charSet){
+    /**
+     * 清空按钮点击事件的处理
+     * @param target
+     * @param addressArea
+     * @param textArea
+     */
+    public static void clearAction(JTextArea target, JTextArea addressArea, JTextArea textArea) {
+        new TooltipTextForArea();
+        addressArea.setText("");
+        textArea.setText("");
+    }
+
+    /**
+     * 搜素按钮点击事件处理
+     * @param target
+     * @param address
+     * @param characterSet
+     * @param textArea
+     */
+    public static void searchAction(JTextArea target, JTextArea address, JTextField characterSet, JTextArea textArea) {
+        StringBuffer resulet = new StringBuffer("");
+        String targetStr = target.getText();
+        System.out.println("目标栏数据："+targetStr);
+        String filePath = address.getText();
+        System.out.println("地址栏数据："+filePath);
+        // 对目标栏中的数据和地址栏中的数据进行判断，如果为空则弹出提示
+        boolean isAbnormalData = (TooltipTextForArea.getHintText().equals(targetStr)) || ("".equals(address));
+        if (isAbnormalData){
+            JOptionPane.showMessageDialog(null,ERROR_MESSAGE,TITLE,JOptionPane.ERROR_MESSAGE);
+        }else {
+            String charSet = charSetHandler(characterSet.getText());
+            String[] filePaths = filePath.split("\n");
+            for (String path : filePaths) {
+                resulet.append(fileHandler(path, targetStr, charSet));
+            }
+            String exportFilePath = exportFile(resulet.toString());
+            resulet.append("详细信息已导出至").append(exportFilePath);
+            textArea.setText(resulet.toString());
+        }
+    }
+
+    /**
+     * 文件处理类
+     * @param filePath
+     * @param targetStr
+     * @param charSet
+     * @return
+     */
+    private static String fileHandler(String filePath,String targetStr,String charSet){
         StringBuffer result = new StringBuffer("");
         boolean matchingState = false;
         // 常见File对象
@@ -170,7 +149,12 @@ public class ExecuteFrame {
         return result.toString();
     }
 
-    public String charSetHandler(String arg){
+    /**
+     * 字符集处理方法
+     * @param arg 传入的字符参数
+     * @return 处理后的字符参数
+     */
+    private static String charSetHandler(String arg){
         String result = "";
         switch (arg){
             case "GBK":case  "gbk":
@@ -180,5 +164,40 @@ public class ExecuteFrame {
                 result="utf8";
         }
         return result;
+    }
+
+    /**
+     * 导出匹配信息到文件
+     * @param text 匹配信息
+     * @return 文件地址
+     */
+    private static String exportFile(String text){
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd_HHmmss");
+
+        String exportFilePath = ButtonListener.EXPORT_PATH +"/"+sdf.format(date)+".txt";
+        File file = new File(exportFilePath);
+        Writer writer = null;
+        try{
+            writer = new FileWriter(file,true);
+            writer.write(text);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        // 释放资源
+        date = null;
+        sdf=null;
+        writer = null;
+        file = null;
+        return exportFilePath;
     }
 }

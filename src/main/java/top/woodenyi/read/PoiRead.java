@@ -1,7 +1,7 @@
 package top.woodenyi.read;
 
 import org.apache.poi.hwpf.extractor.WordExtractor;
-import top.woodenyi.window.TooltipTextForArea;
+import top.woodenyi.window.listener.TooltipTextForArea;
 
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -9,6 +9,7 @@ import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.xmlbeans.XmlException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,7 +124,7 @@ public class PoiRead {
             file.delete();
             file.createNewFile();
         }
-        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"utf8"));
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
         // 数据写出
         writer.write(wordText,0,wordText.length());
         // 刷新缓冲区
@@ -131,7 +132,7 @@ public class PoiRead {
         // 关闭writer流
         writer.close();
         // 数据写入内存
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf8"));
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
         buffer.append(readerFile(reader,targetStr));
         // 关闭reader流
         reader.close();

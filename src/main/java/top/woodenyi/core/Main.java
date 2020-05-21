@@ -1,5 +1,5 @@
 package top.woodenyi.core;
-import top.woodenyi.window.Window;
+import top.woodenyi.window.frame.Window;
 
 /**
  * Copyright (C), Tue,Mar,24,2020,

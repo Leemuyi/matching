@@ -1,4 +1,4 @@
-package top.woodenyi.window;
+package top.woodenyi.window.listener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,18 +19,18 @@ import java.awt.event.FocusListener;
  * @author WoodenYi
  */
 public class TooltipTextForArea implements FocusListener {
-    private static String hintText = "1.目标文本框不能为空;\n" +
+    private static final String HINT_TEXT = "1.目标文本框不能为空;\n" +
             "2.默认字符集为UTF-8;\n" +
             "3.文件选择操作不支持回退功能,即选错只能点击清空按钮进行重置;";
     private JTextArea textArea;
 
     public static String getHintText() {
-        return hintText;
+        return HINT_TEXT;
     }
     public TooltipTextForArea(){}
     public TooltipTextForArea(JTextArea textArea) {
         this.textArea = textArea;
-        textArea.setText(TooltipTextForArea.hintText);
+        textArea.setText(TooltipTextForArea.HINT_TEXT);
         textArea.setForeground(Color.GRAY);
     }
 
@@ -38,7 +38,7 @@ public class TooltipTextForArea implements FocusListener {
     public void focusGained(FocusEvent e) {
         //获取焦点时，清空提示内容
         String temp = textArea.getText();
-        if(temp.equals(TooltipTextForArea.hintText)) {
+        if(temp.equals(TooltipTextForArea.HINT_TEXT)) {
             textArea.setText("");
             textArea.setForeground(Color.BLACK);
         }
@@ -50,7 +50,7 @@ public class TooltipTextForArea implements FocusListener {
         String temp = textArea.getText();
         if(temp.equals("")) {
             textArea.setForeground(Color.GRAY);
-            textArea.setText(TooltipTextForArea.hintText);
+            textArea.setText(TooltipTextForArea.HINT_TEXT);
         }
     }
 }

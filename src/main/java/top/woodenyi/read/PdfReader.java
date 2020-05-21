@@ -4,6 +4,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.fit.pdfdom.PDFDomTree;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Copyright (C), Fri,Apr,03,2020,
@@ -26,7 +27,7 @@ public class PdfReader {
         String outputPath = "C:\\Users\\woodenYi\\Desktop\\DateBase.html";
         byte[] bytes = getBytes("C:\\Users\\woodenYi\\Desktop\\DateBase.pdf");
 //        try() 写在()里面会自动关闭流
-        try (Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputPath)),"utf8"));){
+        try (Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputPath)), StandardCharsets.UTF_8));){
             //加载PDF文档
             PDDocument document = PDDocument.load(bytes);
             PDFDomTree pdfDomTree = new PDFDomTree();

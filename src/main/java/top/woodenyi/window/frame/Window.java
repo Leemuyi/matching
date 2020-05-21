@@ -1,4 +1,4 @@
-package top.woodenyi.window;
+package top.woodenyi.window.frame;
 
 import javax.swing.*;
 
